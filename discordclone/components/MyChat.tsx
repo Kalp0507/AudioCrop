@@ -2,6 +2,7 @@ import { useClient } from "@/hooks/useClient";
 import { User } from "stream-chat";
 import { Chat, Channel, ChannelList, ChannelHeader, MessageList, MessageInput, Thread, Window } from "stream-chat-react";
 import 'stream-chat-react/dist/css/v2/index.css'
+import ServerList from './ServerList/ServerList';
 
 export default function MyChat({
     apiKey,
@@ -21,7 +22,7 @@ export default function MyChat({
         return (
             <Chat client={chatClient} theme="str-chat__theme-light">
                 <section className="flex h-screen w-screen layout">
-                    <div className="bg-blue-500"></div>
+                    <ServerList/>
                     <ChannelList/>
                     <Channel>
                         <Window>
