@@ -1,7 +1,9 @@
 import { DiscordServer } from "@/models/DiscordServer";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { v4 as uuid } from 'uuid';
+import CreateServerForm from "./CreateServerForm";
 
 export default function ServerList():JSX.Element{
     const [activeServer,setActiveServer]=useState<DiscordServer|undefined>()
@@ -47,6 +49,12 @@ export default function ServerList():JSX.Element{
                     )}
                 </button>
             ))}
+            <Link href={'/?createServer=true'}
+                className="flex items-center justify-center rounded-icon bg-white p-2 my-2 text-2xl font-light h-12 w-12 text-green-500 hover:bg-green-500 hover:text-white hover:rounded-xl transition-all duration-200"
+            >
+                <span className="inline-block">+</span>
+            </Link>
+            <CreateServerForm/>
         </div>
     )
 }
