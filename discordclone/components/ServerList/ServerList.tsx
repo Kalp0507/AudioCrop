@@ -1,29 +1,42 @@
 import { DiscordServer } from "@/models/DiscordServer";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useCallback, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import CreateServerForm from "./CreateServerForm";
+import { useChatContext } from "stream-chat-react";
+import { Channel } from "stream-chat";
+import { useDiscordContext } from "@/contexts/DiscordContext";
 
 export default function ServerList():JSX.Element{
-    const [activeServer,setActiveServer]=useState<DiscordServer|undefined>()
-    const servers: DiscordServer[] = [
-        {
-            id: '1',
-            name:'Test Server 1',
-            image:'https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8dGVjaG5vbG9neXxlbnwwfHwwfHx8MA%3D%3D'
-        },
-        {
-            id: '2',
-            name:'Test Server 2',
-            image:'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8dGVjaG5vbG9neXxlbnwwfHwwfHx8MA%3D%3D'
-        },
-        {
-            id: '3',
-            name:'Test Server 3',
-            image:'https://images.unsplash.com/photo-1483058712412-4245e9b90334?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fHRlY2hub2xvZ3l8ZW58MHx8MHx8fDA%3D'
-        },
-    ]
+    const { client } = useChatContext();
+    const [serverList, setServerList] = useState<DiscordServer[]>([]);
+    const {server: activeServer, changeServer} = useDiscordContext()
+
+    const loadServerList = useCallback(async():Promise<void>=>{
+        const channels = await client.queryChannels({
+            type: 'messaging',
+            members: { $in: [client.userID as string] },
+        })
+        const serverSet : Set<DiscordServer> = new Set(
+            channels.map((channel:Channel)=>{
+                return{
+                    id:channel.data?.data?.id,
+                    name: ( channel.data?.data?.server as string ) ?? 'Unknown',
+                    image : channel.data?.data?.image,
+                }
+            })
+            .filter((server : DiscordServer)=> server.name !== 'Unknown')
+            .filter(( server:DiscordServer, index, self )=> index === self.findIndex((serverObject)=> serverObject.name == server.name))
+        )
+        const serverArray = Array.from(serverSet.values());
+        setServerList(serverArray);
+        if( serverArray.length > 0 ) changeServer( serverArray[0], client );
+    },[client,changeServer])
+
+    useEffect(()=>{
+        loadServerList();
+    },[loadServerList])
 
     function checkIfUrl(path:string):Boolean {
         try {
@@ -36,9 +49,16 @@ export default function ServerList():JSX.Element{
 
     return (
         <div className="bg-dark-gray h-full flex flex-col items-center ">
-            {servers.map((server)=>(
+            <button className={`block p-3 sidebar-icon aspect-square border-b-2 border-b-gray-300 ${
+                activeServer===undefined? 'selected-icon' : ''
+            }`}
+            onClick={()=> changeServer(undefined,client)}
+            >
+                <div className="rounded-icon discord-icon"/>
+            </button>
+            {serverList.map((server)=>(
                 <button key={server.id}
-                    onClick={()=> setActiveServer(server)}
+                    onClick={()=> changeServer(server,client)}
                     className={`p-1 sidebar-icon ${server.id == activeServer?.id ? "selected-icon":""}`}>
                     {server.image && checkIfUrl(server.image) ? (
                         <Image src={server.image} alt="Server Icon" width={50} height={50} className="rounded-icon"/>

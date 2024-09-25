@@ -11,9 +11,7 @@ export default function MyChat({
     apiKey: string;
     user: User;
     token:string;}){
-        const chatClient = useClient({
-            apiKey,user,tokenOrProvider:token
-        })
+        const chatClient = useClient({ apiKey, user, tokenOrProvider:token })
 
         if(!chatClient){
             return <div >Error, please try again later.</div>

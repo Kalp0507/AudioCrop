@@ -72,6 +72,7 @@ export default function Home() {
     }
   },[registerUser, clerkUser]);
 
+  console.log(clerkUser);
   if(!homeState){
     return <LoadingIndicator/>;
   }

@@ -2,10 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@import '~stream-chat-react/dist/css/v2/index.css';
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+
+  --discord-purple: #7289da;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -100,6 +104,15 @@ input[type='text']{
   }
 }
 
+input[type='checkbox']{
+  @apply w-5 h-5;
+  accent-color: black;
+}
+
+dialog{
+  width: clamp(30rem,50%,50rem);
+}
+
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #ccc #fff;
@@ -121,4 +134,16 @@ input[type='text']{
   &::-webkit-scrollbar-button {
     display: none;
   }
+}
+
+.discord-icon{
+  @apply bg-white w-full h-full p-3;
+  background: url('../assets/discord-black.svg') no-repeat center center, white;
+  background-origin: content-box;
+}
+
+.discord-icon:hover {
+  background: url('../assets/discord-white.svg') no-repeat center center, var(--discord-purple);
+  --offset:1.5rem;
+  background-origin: content-box;
 }
